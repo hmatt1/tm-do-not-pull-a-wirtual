@@ -14,10 +14,10 @@ jobs:
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        filename: 'CotdCountdown.op'
+        filename: 'DoNotPullAWirtual.op'
         exclusions: 'LICENSE *.md *.git*'
     - name: Upload Release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "CotdCountdown.op"
+        artifacts: "DoNotPullAWirtual.op"
         token: ${{ secrets.GITHUB_TOKEN }}
