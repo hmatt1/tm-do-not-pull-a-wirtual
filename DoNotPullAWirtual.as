@@ -2,12 +2,11 @@
 [Setting name="Enable Clutch Time"]
 bool clutchTimeEnabled = true;
 
-[Setting name="Anchor X position" min=0 max=1]
-float anchorX = .5;
-
 [Setting name="Anchor Y position" min=0 max=1]
 float anchorY = .5;
 
+[Setting name="font size" min=20]
+float fontSize = 200;
 
 bool hideCounterWithIFace = false;
 
@@ -38,13 +37,19 @@ void RenderMenuMain()
 }
 
 void Render() {
-  if(clutchTimeEnabled && inGame && curCP == maxCP) {
-  //if(clutchTimeEnabled && inGame) {
+  //if(clutchTimeEnabled && inGame && curCP == maxCP) {
+  if(clutchTimeEnabled && inGame) {
     
-    float size = 200;
-    nvg::FontSize(size);
-    nvg::TextBox(anchorX * Draw::GetWidth() - 500, anchorY * Draw::GetHeight(), Draw::GetWidth(), "Clutch Time");
+    nvg::FillColor(vec4(1, 1, 1, 1));
+    nvg::FontSize(fontSize);
+    nvg::TextAlign(nvg::Align::Center);
+    nvg::TextBox(0, anchorY * Draw::GetHeight(), Draw::GetWidth(), "Clutch Time");
 
+    nvg::BeginPath();
+    nvg::Rect(0, 0, Draw::GetWidth(), Draw::GetHeight());
+    nvg::FillColor(vec4(1, 0, 0, 0.5));
+    nvg::Fill();
+    nvg::ClosePath();
   }
 }
 
