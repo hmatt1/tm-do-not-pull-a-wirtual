@@ -25,27 +25,34 @@ vec4 textColor = randomTextColor();
 
 bool musicSpeedUp = false;
 
+
+bool debugEnabled = false;
+
 void RenderMenuMain()
 {
-    string colorCode = "\\$0F7";
-    string textPosition = "600";
+    if (debugEnabled) {
 
-    //string text = "hello world";
-
-    string musicStatus;
-    if (musicSpeedUp) {
-        musicStatus = "true";
-    } else {
-        musicStatus = "false";
+        string colorCode = "\\$0F7";
+        string textPosition = "600";
+    
+        //string text = "hello world";
+    
+        string musicStatus;
+        if (musicSpeedUp) {
+            musicStatus = "true";
+        } else {
+            musicStatus = "false";
+        }
+    
+        string text = "curCP: " + Text::Format("%d", curCP) + " maxCP: " + Text::Format("%d", maxCP) +  " timestamp: " + Text::Format("%d", timestamp) + " music: " + musicStatus;
+    	auto textSize = Draw::MeasureString(text);
+    
+    	auto pos_orig = UI::GetCursorPos();
+    	UI::SetCursorPos(vec2(UI::GetWindowSize().x - textSize.x - Text::ParseInt(textPosition), pos_orig.y));
+    	UI::Text(text);
+    	UI::SetCursorPos(pos_orig);
+    
     }
-
-    string text = "curCP: " + Text::Format("%d", curCP) + " maxCP: " + Text::Format("%d", maxCP) +  " timestamp: " + Text::Format("%d", timestamp) + " music: " + musicStatus;
-	auto textSize = Draw::MeasureString(text);
-
-	auto pos_orig = UI::GetCursorPos();
-	UI::SetCursorPos(vec2(UI::GetWindowSize().x - textSize.x - Text::ParseInt(textPosition), pos_orig.y));
-	UI::Text(text);
-	UI::SetCursorPos(pos_orig);
 }
 
 vec4 randomColor() {
