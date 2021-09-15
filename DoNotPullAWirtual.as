@@ -39,8 +39,11 @@ void RenderMenuMain()
 
 void Render() {
   if(clutchTimeEnabled && inGame && curCP == maxCP) {
+  //if(clutchTimeEnabled && inGame) {
     
-    nvg::TextBox(anchorX * Draw::GetWidth() - 100, anchorY * Draw::GetHeight(), 200, "Clutch Time");
+    float size = 200;
+    nvg::FontSize(size);
+    nvg::TextBox(anchorX * Draw::GetWidth() - 500, anchorY * Draw::GetHeight(), Draw::GetWidth(), "Clutch Time");
 
   }
 }
