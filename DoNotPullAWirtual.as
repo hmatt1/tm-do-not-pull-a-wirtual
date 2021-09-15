@@ -23,6 +23,7 @@ uint64 timestamp = 0;
 vec4 overlayColor = randomColor();
 vec4 textColor = randomTextColor();
 
+bool musicSpeedUp = false;
 
 void RenderMenuMain()
 {
@@ -30,7 +31,15 @@ void RenderMenuMain()
     string textPosition = "600";
 
     //string text = "hello world";
-    string text = "curCP: " + Text::Format("%d", curCP) + " maxCP: " + Text::Format("%d", maxCP) +  " timestamp: " + Text::Format("%d", timestamp);
+
+    string musicStatus;
+    if (musicSpeedUp) {
+        musicStatus = "true";
+    } else {
+        musicStatus = "false";
+    }
+
+    string text = "curCP: " + Text::Format("%d", curCP) + " maxCP: " + Text::Format("%d", maxCP) +  " timestamp: " + Text::Format("%d", timestamp) + " music: " + musicStatus;
 	auto textSize = Draw::MeasureString(text);
 
 	auto pos_orig = UI::GetCursorPos();
@@ -54,11 +63,49 @@ vec4 randomTextColor() {
     return vec4(red, green, blue, 1);
 }
 
+void speedUpMusic() {
 
+    if (!musicSpeedUp) {
+        musicSpeedUp = true;
+        // speed up
+        setPitch(1.7f);
+    }
+
+    return;
+}
+
+void resetMusic() {
+    if (musicSpeedUp) {
+        // slow down
+        musicSpeedUp = false;
+        setPitch(1.0);
+    }
+    return;
+}
+
+void setPitch(float pitch) {
+    auto app = GetApp();
+    auto audioPort = GetApp().AudioPort;
+    for (uint i = 0; i < audioPort.Sources.Length; i++) {
+      auto source = audioPort.Sources[i];
+    
+      // Get the sound that the source can play
+      auto sound = source.PlugSound;
+    
+      // Check if its file is an .ogg file
+      if (cast<CPlugFileOggVorbis>(sound.PlugFile) is null) {
+        // Skip if it's not an ogg file
+        continue;
+      }
+     source.Pitch = pitch;
+
+   }
+}
 void Render() {
-  //if(clutchTimeEnabled && inGame && curCP == maxCP) {
-  if(clutchTimeEnabled && inGame) {
+  if(clutchTimeEnabled && inGame && curCP == maxCP) {
+ //if(clutchTimeEnabled && inGame) {
 
+    speedUpMusic();
 
     uint64 now = Time::get_Now();
 
@@ -80,6 +127,8 @@ void Render() {
     nvg::TextBox(0, anchorY * Draw::GetHeight(), Draw::GetWidth(), "Clutch Time");
 
     
+  } else {
+      resetMusic();
   }
 }
 
@@ -132,7 +181,9 @@ void calculateCheckpoints(float dt) {
     preCPIdx = player.CurrentLaunchedRespawnLandmarkIndex;
     curCP = 0;
     maxCP = 0;
+    timestamp = 0;
     strictMode = true;
+    resetMusic();
     
     array<int> links = {};
     for(uint i = 0; i < landmarks.Length; i++) {
