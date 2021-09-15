@@ -15,7 +15,7 @@ jobs:
       with:
         type: 'zip'
         filename: 'DoNotPullAWirtual.op'
-        exclusions: 'LICENSE *.md *.git*'
+        exclusions: 'LICENSE *.md *.git* *.bat'
     - name: Upload Release
       uses: ncipollo/release-action@v1
       with:
