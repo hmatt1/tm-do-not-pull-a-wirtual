@@ -19,6 +19,9 @@ uint preCPIdx = 0;
 
 uint curCP = 0;
 uint maxCP = 0;
+uint64 timestamp = 0;
+vec4 overlayColor = randomColor();
+vec4 textColor = randomTextColor();
 
 
 void RenderMenuMain()
@@ -27,7 +30,7 @@ void RenderMenuMain()
     string textPosition = "600";
 
     //string text = "hello world";
-    string text = "curCP: " + Text::Format("%d", curCP) + " maxCP: " + Text::Format("%d", maxCP);
+    string text = "curCP: " + Text::Format("%d", curCP) + " maxCP: " + Text::Format("%d", maxCP) +  " timestamp: " + Text::Format("%d", timestamp);
 	auto textSize = Draw::MeasureString(text);
 
 	auto pos_orig = UI::GetCursorPos();
@@ -36,20 +39,47 @@ void RenderMenuMain()
 	UI::SetCursorPos(pos_orig);
 }
 
+vec4 randomColor() {
+    float red = Math::Rand(0.0, 1.0);
+    float green = Math::Rand(0.0, 1.0);
+    float blue = Math::Rand(0.0, 1.0);
+    float transparency = Math::Rand(.4, .6);
+    return vec4(red, green, blue, transparency);
+}
+
+vec4 randomTextColor() {
+    float red = Math::Rand(0.0, 1.0);
+    float green = Math::Rand(0.0, 1.0);
+    float blue = Math::Rand(0.0, 1.0);
+    return vec4(red, green, blue, 1);
+}
+
+
 void Render() {
   //if(clutchTimeEnabled && inGame && curCP == maxCP) {
   if(clutchTimeEnabled && inGame) {
+
+
+    uint64 now = Time::get_Now();
+
+    if (timestamp == 0 || now >= timestamp) {
+        timestamp = now + 500;
+        overlayColor = randomColor();
+        textColor = randomTextColor();
+    }
+
+    nvg::BeginPath();
+    nvg::Rect(0, 0, Draw::GetWidth(), Draw::GetHeight());
+    nvg::FillColor(overlayColor);
+    nvg::Fill();
+    nvg::ClosePath();
     
-    nvg::FillColor(vec4(1, 1, 1, 1));
+    nvg::FillColor(textColor);
     nvg::FontSize(fontSize);
     nvg::TextAlign(nvg::Align::Center);
     nvg::TextBox(0, anchorY * Draw::GetHeight(), Draw::GetWidth(), "Clutch Time");
 
-    nvg::BeginPath();
-    nvg::Rect(0, 0, Draw::GetWidth(), Draw::GetHeight());
-    nvg::FillColor(vec4(1, 0, 0, 0.5));
-    nvg::Fill();
-    nvg::ClosePath();
+    
   }
 }
 
