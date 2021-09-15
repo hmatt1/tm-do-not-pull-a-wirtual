@@ -15,3 +15,11 @@ Feel free to make changes and open a PR. Open an issue if you have any questions
     git tag 0.0.3
     git push origin 0.0.3
     ```
+
+## Video Demo
+
+https://www.youtube.com/watch?v=K1Qf2kNXmYw
+
+## Releases
+
+https://openplanet.nl/files/133
