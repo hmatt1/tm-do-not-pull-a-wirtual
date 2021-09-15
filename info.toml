@@ -1,0 +1,15 @@
+[meta]
+name = "Do Not Pull a Wirtual"
+author = "hmatt1"
+category = "Memes"
+
+blocks = []
+
+version = "0.1"
+
+[game]
+min_version = "2020-12-25"
+
+[script]
+imports = []
+© 2021 GitHub, Inc.
