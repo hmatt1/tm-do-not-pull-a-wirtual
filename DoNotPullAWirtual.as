@@ -116,7 +116,7 @@ void Render() {
 
     uint64 now = Time::get_Now();
 
-    if (timestamp == 0 || now >= timestamp) {
+    if (now >= timestamp) {
         timestamp = now + 500;
         overlayColor = randomColor();
         textColor = randomTextColor();
