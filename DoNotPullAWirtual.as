@@ -5,8 +5,23 @@ bool clutchTimeEnabled = true;
 [Setting name="Anchor Y position" min=0 max=1]
 float anchorY = .5;
 
-[Setting name="font size" min=20]
+[Setting name="Font size" min=20]
 float fontSize = 200;
+
+[Setting name="Minimum opacity" min=0 max=1]
+float minAlpha = 0.2;
+
+[Setting name="Maximum opacity" min=0 max=1]
+float maxAlpha = 0.5;
+
+[Setting name="Music speed percentage" min=1]
+int musicPitch = 170;
+
+[Setting name="Seconds between flashes" min=0.001]
+float flashSpeed = 0.5;
+
+[Setting name="Clutch text"]
+string clutchText = "Clutch Time";
 
 bool hideCounterWithIFace = false;
 
@@ -59,7 +74,7 @@ vec4 randomColor() {
     float red = Math::Rand(0.0, 1.0);
     float green = Math::Rand(0.0, 1.0);
     float blue = Math::Rand(0.0, 1.0);
-    float transparency = Math::Rand(.4, .6);
+    float transparency = Math::Rand(minAlpha, maxAlpha);
     return vec4(red, green, blue, transparency);
 }
 
@@ -75,7 +90,7 @@ void speedUpMusic() {
     if (!musicSpeedUp) {
         musicSpeedUp = true;
         // speed up
-        setPitch(1.7f);
+        setPitch(musicPitch / 100);
     }
 
     return;
@@ -116,8 +131,8 @@ void Render() {
 
     uint64 now = Time::get_Now();
 
-    if (timestamp == 0 || now >= timestamp) {
-        timestamp = now + 500;
+    if (now >= timestamp + flashSpeed * 1000) {
+        timestamp = now;
         overlayColor = randomColor();
         textColor = randomTextColor();
     }
@@ -131,7 +146,7 @@ void Render() {
     nvg::FillColor(textColor);
     nvg::FontSize(fontSize);
     nvg::TextAlign(nvg::Align::Center);
-    nvg::TextBox(0, anchorY * Draw::GetHeight(), Draw::GetWidth(), "Clutch Time");
+    nvg::TextBox(0, anchorY * Draw::GetHeight(), Draw::GetWidth(), clutchText);
 
     
   } else {
