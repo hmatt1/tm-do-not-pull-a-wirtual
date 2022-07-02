@@ -1,11 +1,11 @@
 [meta]
 name = "Do Not Pull a Wirtual"
-author = "hmatt1"
+author = "hmatt1 & Kodey.Kayla"
 category = "Memes"
 
 blocks = []
 
-version = "0.1"
+version = "0.2"
 
 [game]
 min_version = "2020-12-25"
