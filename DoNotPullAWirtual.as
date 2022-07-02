@@ -123,7 +123,7 @@ void setPitch(float pitch) {
 
       // Check is source playing and is it in the music group.
       // This is *likely* to only be the music, as opposed to the above.
-      if (source.BalanceGroup == 1 && source.IsPlaying) {
+      if (source.BalanceGroup == EAudioBalanceGroup::Music && source.IsPlaying) {
         source.Pitch = pitch;
         lastSource = i;
       }
