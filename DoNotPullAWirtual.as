@@ -42,8 +42,6 @@ bool musicSpeedUp = false;
 
 bool debugEnabled = false;
 
-auto app = GetApp();
-auto audioPort = app.AudioPort;
 int lastSource = 0;
 
 void RenderMenuMain()
@@ -109,8 +107,9 @@ void resetMusic() {
 }
 
 void setPitch(float pitch) {
-    for (uint i = 0; i < audioPort.Sources.Length; i++) {
-      auto source = audioPort.Sources[i];
+    auto app = GetApp();
+    for (uint i = 0; i < app.AudioPort.Sources.Length; i++) {
+      auto source = app.AudioPort.Sources[i];
     
       // Get the sound that the source can play
       auto sound = source.PlugSound;
@@ -121,8 +120,10 @@ void setPitch(float pitch) {
         continue;
       }
 
-      // Check is source playing and is it in the music group.
-      // This is *likely* to only be the music, as opposed to the above.
+      /* 
+      Check is source playing and is it in the music group.
+      This is *likely* to only be the music, as opposed to the above. - Kodey.Kayla
+      */
       if (source.BalanceGroup == EAudioBalanceGroup::Music && source.IsPlaying) {
         source.Pitch = pitch;
         lastSource = i;
@@ -162,9 +163,10 @@ void Render() {
 }
 
 void Update(float dt) {
+  auto app = GetApp();
   calculateCheckpoints(dt);
   if (musicSpeedUp) {
-    if (audioPort.Sources[lastSource].Pitch == 1) {
+    if (app.AudioPort.Sources[lastSource].Pitch == 1) {
       speedUpMusic(true);
     }
   }
@@ -208,7 +210,7 @@ void calculateCheckpoints(float dt) {
   }
   
   MwFastBuffer<CGameScriptMapLandmark@> landmarks = playground.Arena.MapLandmarks;
-  
+
   if(!inGame && (curMap != playground.Map.IdName || GetApp().Editor !is null)) {
     // keep the previously-determined CP data, unless in the map editor
     curMap = playground.Map.IdName;
@@ -266,4 +268,5 @@ void calculateCheckpoints(float dt) {
       curCP++;
     }
   }
+#endif
 }
