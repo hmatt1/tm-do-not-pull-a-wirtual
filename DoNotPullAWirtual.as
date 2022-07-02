@@ -90,7 +90,7 @@ void speedUpMusic() {
     if (!musicSpeedUp) {
         musicSpeedUp = true;
         // speed up
-        setPitch(musicPitch / 100);
+        setPitch(float(musicPitch) / 100);
     }
 
     return;
