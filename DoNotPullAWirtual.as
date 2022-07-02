@@ -1,4 +1,3 @@
-
 [Setting name="Enable Clutch Time"]
 bool clutchTimeEnabled = true;
 
@@ -43,6 +42,10 @@ bool musicSpeedUp = false;
 
 bool debugEnabled = false;
 
+auto app = GetApp();
+auto audioPort = app.AudioPort;
+int lastSource = 0;
+
 void RenderMenuMain()
 {
     if (debugEnabled) {
@@ -85,9 +88,9 @@ vec4 randomTextColor() {
     return vec4(red, green, blue, 1);
 }
 
-void speedUpMusic() {
+void speedUpMusic(bool force = false) {
 
-    if (!musicSpeedUp) {
+    if (!musicSpeedUp || force) {
         musicSpeedUp = true;
         // speed up
         setPitch(float(musicPitch) / 100);
@@ -106,8 +109,6 @@ void resetMusic() {
 }
 
 void setPitch(float pitch) {
-    auto app = GetApp();
-    auto audioPort = GetApp().AudioPort;
     for (uint i = 0; i < audioPort.Sources.Length; i++) {
       auto source = audioPort.Sources[i];
     
@@ -119,7 +120,13 @@ void setPitch(float pitch) {
         // Skip if it's not an ogg file
         continue;
       }
-     source.Pitch = pitch;
+
+      // Check is source playing and is it in the music group.
+      // This is *likely* to only be the music, as opposed to the above.
+      if (source.BalanceGroup == 1 && source.IsPlaying) {
+        source.Pitch = pitch;
+        lastSource = i;
+      }
 
    }
 }
@@ -155,7 +162,12 @@ void Render() {
 }
 
 void Update(float dt) {
-    calculateCheckpoints(dt);
+  calculateCheckpoints(dt);
+  if (musicSpeedUp) {
+    if (audioPort.Sources[lastSource].Pitch == 1) {
+      speedUpMusic(true);
+    }
+  }
 }
 
 
