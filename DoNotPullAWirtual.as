@@ -1,12 +1,26 @@
-
 [Setting name="Enable Clutch Time"]
 bool clutchTimeEnabled = true;
 
 [Setting name="Anchor Y position" min=0 max=1]
 float anchorY = .5;
 
-[Setting name="font size" min=20]
+[Setting name="Font size" min=20]
 float fontSize = 200;
+
+[Setting name="Minimum opacity" min=0 max=1]
+float minAlpha = 0.2;
+
+[Setting name="Maximum opacity" min=0 max=1]
+float maxAlpha = 0.5;
+
+[Setting name="Music speed percentage" min=1]
+int musicPitch = 170;
+
+[Setting name="Seconds between flashes" min=0.001]
+float flashSpeed = 0.5;
+
+[Setting name="Clutch text"]
+string clutchText = "Clutch Time";
 
 bool hideCounterWithIFace = false;
 
@@ -27,6 +41,8 @@ bool musicSpeedUp = false;
 
 
 bool debugEnabled = false;
+
+int lastSource = 0;
 
 void RenderMenuMain()
 {
@@ -59,7 +75,7 @@ vec4 randomColor() {
     float red = Math::Rand(0.0, 1.0);
     float green = Math::Rand(0.0, 1.0);
     float blue = Math::Rand(0.0, 1.0);
-    float transparency = Math::Rand(.4, .6);
+    float transparency = Math::Rand(minAlpha, maxAlpha);
     return vec4(red, green, blue, transparency);
 }
 
@@ -70,12 +86,12 @@ vec4 randomTextColor() {
     return vec4(red, green, blue, 1);
 }
 
-void speedUpMusic() {
+void speedUpMusic(bool force = false) {
 
-    if (!musicSpeedUp) {
+    if (!musicSpeedUp || force) {
         musicSpeedUp = true;
         // speed up
-        setPitch(1.7f);
+        setPitch(float(musicPitch) / 100);
     }
 
     return;
@@ -92,9 +108,8 @@ void resetMusic() {
 
 void setPitch(float pitch) {
     auto app = GetApp();
-    auto audioPort = GetApp().AudioPort;
-    for (uint i = 0; i < audioPort.Sources.Length; i++) {
-      auto source = audioPort.Sources[i];
+    for (uint i = 0; i < app.AudioPort.Sources.Length; i++) {
+      auto source = app.AudioPort.Sources[i];
     
       // Get the sound that the source can play
       auto sound = source.PlugSound;
@@ -104,7 +119,15 @@ void setPitch(float pitch) {
         // Skip if it's not an ogg file
         continue;
       }
-     source.Pitch = pitch;
+
+      /* 
+      Check is source playing and is it in the music group.
+      This is *likely* to only be the music, as opposed to the above. - Kodey.Kayla
+      */
+      if (source.BalanceGroup == EAudioBalanceGroup::Music && source.IsPlaying) {
+        source.Pitch = pitch;
+        lastSource = i;
+      }
 
    }
 }
@@ -116,8 +139,8 @@ void Render() {
 
     uint64 now = Time::get_Now();
 
-    if (timestamp == 0 || now >= timestamp) {
-        timestamp = now + 500;
+    if (now >= timestamp + flashSpeed * 1000) {
+        timestamp = now;
         overlayColor = randomColor();
         textColor = randomTextColor();
     }
@@ -131,7 +154,7 @@ void Render() {
     nvg::FillColor(textColor);
     nvg::FontSize(fontSize);
     nvg::TextAlign(nvg::Align::Center);
-    nvg::TextBox(0, anchorY * Draw::GetHeight(), Draw::GetWidth(), "Clutch Time");
+    nvg::TextBox(0, anchorY * Draw::GetHeight(), Draw::GetWidth(), clutchText);
 
     
   } else {
@@ -140,7 +163,13 @@ void Render() {
 }
 
 void Update(float dt) {
-    calculateCheckpoints(dt);
+  auto app = GetApp();
+  calculateCheckpoints(dt);
+  if (musicSpeedUp) {
+    if (app.AudioPort.Sources[lastSource].Pitch == 1) {
+      speedUpMusic(true);
+    }
+  }
 }
 
 
@@ -181,7 +210,7 @@ void calculateCheckpoints(float dt) {
   }
   
   MwFastBuffer<CGameScriptMapLandmark@> landmarks = playground.Arena.MapLandmarks;
-  
+
   if(!inGame && (curMap != playground.Map.IdName || GetApp().Editor !is null)) {
     // keep the previously-determined CP data, unless in the map editor
     curMap = playground.Map.IdName;
@@ -239,4 +268,5 @@ void calculateCheckpoints(float dt) {
       curCP++;
     }
   }
+#endif
 }
